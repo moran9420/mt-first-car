@@ -9,21 +9,18 @@
 #include "PWM.h"
 #include "Serial.h"
 #include <stdlib.h>
+#include "menu.h"
+#include "rotate.h"
+#include "HONGWAI.h"
 int8_t count=0;
-uint8_t flag=1;
 uint8_t KeyNum;		//定义用于接收按键键码的变量
-int16_t actualSpeed1=0;		//定义速度变量
-int16_t targetSpeed1=0;
-int16_t actualSpeed2=0;		//定义速度变量
-int16_t targetSpeed2=0;
-int32_t actualpos1=0;		//定义速度变量
-int32_t targetpos1=0;
-int32_t actualpos2=0;		//定义速度变量
-int32_t targetpos2=0;
+
+
 uint16_t serialcount=0;
 int main(void)
 {
-	/*模块初始化*/
+	Infrared_Init();/*模块初始化*/
+	rotate_Init();
 	Serial_Init();
 	OLED_Init();		//OLED初始化
 	Motor_Init();		//直流电机初始化
@@ -32,43 +29,38 @@ int main(void)
 	Timer_Init();
 	 Encoder_Init();
 	while(1)
-	{
+	{{if(flag==1)
+	{MENU_Display();
+	flag=0;}
+	Delay_ms(5);
+	}
 	Key_GetNum();
-			if(Serial_RxFlag==1)
-		{
-		targetSpeed1=atoi(Serial_RxPacketnum);
-			Serial_RxFlag=0;
-		}
-	if(currentmode==0)
-	{
-	OLED_ShowString(1,1,"speedmode");
-	}
-	else
-	{
-			OLED_ShowString(1,1,"positionmode");
-	}
+	uint16_t rotatedelta=rotate_Get();
+	if(rotatedelta!=0&&mode==1)
+	{menuencoder(rotatedelta);
+
 	Delay_ms(10);
 	}
-}
+}}
 
 void TIM1_UP_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) == SET)
-	{		static int16_t lastpos=0;					//每隔固定时间段读取一次编码器计数增量值，即为速度值
+	{						//每隔固定时间段读取一次编码器计数增量值，即为速度值
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);	
 		serialcount++;
-		if(currentmode==0)
+		 Infrared_TrackingControl();
+		if(currentmode==1)
 		{
-			
+			actualSpeed2 = Encoder_Get2();
 			actualSpeed1 = Encoder_Get1();
-			int16_t pwmout=pidspeedcal(targetSpeed1,actualSpeed1);			
+			int16_t pwmout=pidspeedcal(targetSpeed1,actualSpeed1);
+			int16_t pwmout1=pidspeedcal(targetSpeed2,actualSpeed2);				
 			Motor_Setpwm(0,pwmout);
-			if(serialcount>=5)
-			{
-			serialcount=0;
-			usart_sendspeed(targetSpeed1,actualSpeed1);
-			}
+			Motor_Setpwm(1,pwmout1);
 		}
 
 	}
 }
+
+	

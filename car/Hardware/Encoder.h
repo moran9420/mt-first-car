@@ -6,6 +6,5 @@ int16_t Encoder_Get1(void);
 int16_t Encoder_Get2(void);
 extern int16_t posencoder1;
 extern int16_t posencoder2;
-int16_t encodergetpos2(void);
-int16_t encodergetpos1(void);
+
 #endif

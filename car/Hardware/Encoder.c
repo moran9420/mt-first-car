@@ -15,11 +15,11 @@ void Encoder_Init(void)
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;	//将PA6和PA7引脚初始化为上拉输入
-		GPIO_Init(GPIOB, &GPIO_InitStructure);
+		GPIO_Init(GPIOA, &GPIO_InitStructure);
 	/*时基单元初始化*/
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;				//定义结构体变量
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;     //时钟分频，选择不分频，此参数用于配置滤波器时钟，不影响时基单元功能
@@ -90,14 +90,6 @@ int16_t Encoder_Get2(void)
 	posencoder2+=Temp2;
 	TIM_SetCounter(TIM4, 0);
 	return Temp2;
-}
-int16_t encodergetpos1(void)
-{
-return posencoder1;
-}
-int16_t encodergetpos2(void)
-{
-return posencoder2;
 }
 
 

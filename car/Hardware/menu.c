@@ -62,4 +62,7 @@ void MENU_Display(void)
 			} else if(biao == 1) {
 				OLED_ShowString(3, 1, ">");}
 			else if(biao==2)
-			{OLED_ShowString(4, 1, ">");}}
+			{OLED_ShowString(4, 1, ">");}
+}
+
+

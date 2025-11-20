@@ -1,5 +1,6 @@
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
+#include "menu.h"
 uint16_t currentmode=0;
 /**
   * 函    数：按键初始化
@@ -28,16 +29,30 @@ void Key_Init(void)
 uint8_t Key_GetNum(void)
 {
 
-	if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
+	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
 	{
 		Delay_ms(20);											//延时消抖
-		while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0)	//等待按键松手
+		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)	//等待按键松手
 		{Delay_ms(20);	}
 		if(currentmode==0)
 		{currentmode=1;}
 		else
-			currentmode=0;
+		currentmode=0;
 													//置键码为1
+	}
+		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
+	{
+		Delay_ms(20);											//延时消抖
+		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)	//等待按键松手
+		{Delay_ms(20);	}
+		single[1]=1;
+	}
+	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
+	{
+		Delay_ms(20);											//延时消抖
+		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)	//等待按键松手
+		{Delay_ms(20);	}
+		single[2]=1;
 	}
 	return 0;
 	

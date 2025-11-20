@@ -7,6 +7,7 @@ void menuencoder(int16_t encoderdelta);
 void MENU_Display(void);
 extern uint16_t mode;
 extern uint16_t currentmenu;
+extern uint16_t single[4];
 #endif
 
 
