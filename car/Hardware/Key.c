@@ -1,6 +1,8 @@
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
 #include "menu.h"
+#include "rotate.h"
+
 uint16_t currentmode=0;
 /**
   * 函    数：按键初始化
@@ -10,14 +12,14 @@ uint16_t currentmode=0;
 void Key_Init(void)
 {
 	/*开启时钟*/
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);		//开启GPIOB的时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);		//开启GPIOB的时钟
 	
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_10; 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);						//将PB1和PB11引脚初始化为上拉输入
+	GPIO_Init(GPIOB, &GPIO_InitStructure);						//将PB1和PB11引脚初始化为上拉输入
 }
 
 /**
@@ -28,34 +30,38 @@ void Key_Init(void)
   */
 uint8_t Key_GetNum(void)
 {
-
-	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
-	{
-		Delay_ms(20);											//延时消抖
-		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)	//等待按键松手
-		{Delay_ms(20);	}
-		if(currentmode==0)
-		{currentmode=1;}
-		else
-		currentmode=0;
-													//置键码为1
-	}
-		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
-	{
-		Delay_ms(20);											//延时消抖
-		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)	//等待按键松手
-		{Delay_ms(20);	}
-		single[1]=1;
-	}
-	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
-	{
-		Delay_ms(20);											//延时消抖
-		while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)	//等待按键松手
-		{Delay_ms(20);	}
-		single[2]=1;
-	}
-	return 0;
-	
-	
-		
+    if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)
+    {
+        Delay_ms(20);
+        while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)
+        { Delay_ms(20); }
+        
+        currentmode = (currentmode == 0) ? 1 : 0;  // 模式切换
+        flag = 1;  
+        return 1;
+    }
+    
+    if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)
+    {
+        Delay_ms(20);
+        while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)
+        { Delay_ms(20); }
+        single[1] = 1;
+        flag = 1;
+        return 2;
+    }
+    
+    if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)
+    {
+        Delay_ms(20);
+        while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0)
+        { Delay_ms(20); }
+        single[2] = 1;
+        flag = 1;
+        return 3;
+    }
+    
+    return 0;
 }
+
+

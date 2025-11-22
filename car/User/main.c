@@ -29,26 +29,28 @@ int main(void)
 	Timer_Init();
 	 Encoder_Init();
 	while(1)
-	{{if(flag==1)
+	{
+		if(flag==1)
 	{MENU_Display();
 	flag=0;}
-	Delay_ms(5);
-	}
+	Delay_ms(2);
+	
 	Key_GetNum();
-	uint16_t rotatedelta=rotate_Get();
-	if(rotatedelta!=0&&mode==1)
+	menukey();
+	int16_t rotatedelta=rotate_Get();
+	if(rotatedelta!=0&&currentmode==0)
 	{menuencoder(rotatedelta);
+	flag=1;}
 
-	Delay_ms(10);
-	}
+	Delay_ms(5);
+	
 }}
 
 void TIM1_UP_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) == SET)
-	{						//每隔固定时间段读取一次编码器计数增量值，即为速度值
+	{						
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);	
-		serialcount++;
 		 Infrared_TrackingControl();
 		if(currentmode==1)
 		{

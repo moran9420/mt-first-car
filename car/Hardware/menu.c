@@ -4,15 +4,16 @@
 	#include "menu.h"
 	#include "Key.h"
 	#include "Encoder.h"
-	#include "pid.h"
+	#include "pid.h"	
+	#include "Key.h"
+	#include "rotate.h"
 	uint16_t single[4]={0};
 	uint16_t currentmenu=0;
-	uint16_t mode=0;
 	uint16_t biao=0;
 		void menuencoder(int16_t encoderdelta)
 	{
 
-		if(currentmenu ==2 && encoderdelta!=0) {
+		if(encoderdelta!=0) {
 			float step = 0.1f;
 			
 			if(biao == 0) {
@@ -32,20 +33,24 @@
 				}
 			}
 		}
-	}void menukey(void)
+	}
+	void menukey(void)
 	{if(single[1]==1)
 	{
 	if(biao==0)
 	biao=2;
 	else biao=biao-1;
-		 single[1] = 0;}
-	else if(single[2]==1)
+		 single[1] = 0;
+	flag=1;}
+	if(single[2]==1)
 	{
-	biao=(biao+1)%3;}
+	biao=(biao+1)%3;
  single[2] = 0;
+		flag=1;
+	}
 	}
 void MENU_Display(void)
-{
+{			OLED_Clear();
 			OLED_ShowString(1,1, "car mode");
 			OLED_ShowString(2, 2, "kp");
 			OLED_ShowString(3, 2, "ki");
@@ -54,6 +59,7 @@ void MENU_Display(void)
 		 sprintf(b,"%.1f",speedpid.kp);
 		 sprintf(c,"%.1f",speedpid.ki);
 		 sprintf(d,"%.1f",speedpid.kd);
+			OLED_ShowNum(1, 14,currentmode,1);
 			OLED_ShowString(2, 14,b);
 			OLED_ShowString(3,14,c);
 			OLED_ShowString(4,14,d);
