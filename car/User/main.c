@@ -54,12 +54,12 @@ void TIM1_UP_IRQHandler(void)
 		 Infrared_TrackingControl();
 		if(currentmode==1)
 		{
-			actualSpeed2 = Encoder_Get2();
-			actualSpeed1 = Encoder_Get1();
-			int16_t pwmout=pidspeedcal(targetSpeed1,actualSpeed1);
-			int16_t pwmout1=pidspeedcal(targetSpeed2,actualSpeed2);				
-			Motor_Setpwm(0,pwmout);
-			Motor_Setpwm(1,pwmout1);
+			actualSpeed2 = -Encoder_Get2();
+			actualSpeed1 = -Encoder_Get1();
+			//int16_t pwmout=pidspeedcal(targetSpeed1,actualSpeed1);//右
+			//int16_t pwmout1=pidspeedcal(targetSpeed2,actualSpeed2);				
+			Motor_Setpwm(0,targetSpeed1);
+			Motor_Setpwm(1,-targetSpeed2);
 		}
 
 	}

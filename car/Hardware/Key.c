@@ -35,8 +35,10 @@ uint8_t Key_GetNum(void)
         Delay_ms(20);
         while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)
         { Delay_ms(20); }
-        
-        currentmode = (currentmode == 0) ? 1 : 0;  // 模式切换
+        if(currentmode==0)
+        {currentmode =  1;}
+		else
+		{currentmode=0;}
         flag = 1;  
         return 1;
     }

@@ -38,7 +38,7 @@ void Encoder_Init(void)
 	TIM_ICInitTypeDef TIM_ICInitStructure;							//定义结构体变量
 	TIM_ICStructInit(&TIM_ICInitStructure);							//结构体初始化，若结构体没有完整赋值
 																	//则最好执行此函数，给结构体所有成员都赋一个默认值
-		TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Falling, TIM_ICPolarity_Rising);															//避免结构体初值不确定的问题
+		TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);															//避免结构体初值不确定的问题
 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;				//选择配置定时器通道1
 	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器参数，可以过滤信号抖动
 	TIM_ICInit(TIM3, &TIM_ICInitStructure);							//将结构体变量交给TIM_ICInit，配置TIM3的输入捕获通道
@@ -51,7 +51,7 @@ void Encoder_Init(void)
 																	//注意此时参数的Rising和Falling已经不代表上升沿和下降沿了，而是代表是否反相
 																	//此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置
 	
-	TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Falling,TIM_ICPolarity_Rising);/*TIM使能*/
+	TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising,TIM_ICPolarity_Rising);/*TIM使能*/
 			//使能TIM3，定时器开始运行
 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;				//选择配置定时器通道1
 	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器参数，可以过滤信号抖动
