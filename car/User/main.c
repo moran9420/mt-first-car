@@ -53,7 +53,11 @@ void TIM1_UP_IRQHandler(void)
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);	
 		 Infrared_TrackingControl();
 		if(currentmode==1)
-		{
+		{	if (turn_keep_flag && turn_keep_time > 0) {
+            turn_keep_time--;}
+            if (turn_keep_time == 0) {
+                turn_keep_flag = 0;
+            }
 			actualSpeed2 = -Encoder_Get2();
 			actualSpeed1 = -Encoder_Get1();
 			//int16_t pwmout=pidspeedcal(targetSpeed1,actualSpeed1);//右

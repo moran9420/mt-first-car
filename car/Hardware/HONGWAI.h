@@ -10,6 +10,9 @@ extern uint8_t infrared_right_inner;
 extern uint8_t infrared_right_outer;
 extern int16_t infrared_error;
 extern uint8_t infrared_track_state;
+extern uint8_t turn_keep_flag;        // 转弯保持标志
+extern uint16_t turn_keep_time;       // 转弯保持时间计数
+extern uint8_t turn_direction;
 
 
 // 函数声明
