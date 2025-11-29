@@ -16,7 +16,7 @@ int16_t targetSpeed2=0;
 uint8_t turn_keep_flag = 0;        // 转弯保持标志
 uint16_t turn_keep_time = 0;       // 转弯保持时间计数
 uint8_t turn_direction = 0; 
-int16_t base_speed = 35; // 转弯方向
+int16_t base_speed = 25; // 转弯方向
   
 void Infrared_Init(void)
 {
@@ -36,6 +36,11 @@ void Infrared_ReadSensors(void)
 {	if (turn_keep_flag) {
         return;
     }
+  if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4) == Bit_RESET) {
+        infrared_right_inner = 1;
+    } else {
+        infrared_right_inner = 0;
+    }
     if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_8) == Bit_RESET) {
         infrared_left_outer = 1;  // 检测到黑线
     } else {
@@ -49,11 +54,7 @@ void Infrared_ReadSensors(void)
         infrared_left_inner = 0;
     }
     
-    if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4) == Bit_RESET) {
-        infrared_right_inner = 1;
-    } else {
-        infrared_right_inner = 0;
-    }
+ 
 
     if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5) == Bit_RESET) {
         infrared_right_outer = 1;
@@ -102,19 +103,27 @@ uint8_t Infrared_GetTrackState(void)
             infrared_left_inner == 0 && infrared_left_outer == 0) {
         return 6;  // 右大弯状态
     }	
+				   else if(infrared_left_outer == 0 && infrared_left_inner == 1 && 
+            infrared_right_inner == 0 && infrared_right_outer == 0) {
+        return 8;  // 左小弯状态
+    }
+		    else if(infrared_right_outer == 0 && infrared_right_inner == 1 && 
+            infrared_left_inner == 0 && infrared_left_outer == 0) {
+        return 9;  // 右小弯状态
+    }
     else if(sensor_sum == 0) {
         return 4; 
     }
 else if(infrared_left_inner == 1 && infrared_right_inner == 1 && 
            infrared_left_outer ==1 && infrared_right_outer == 1) {
-        return 8;  // 直线状态
+        return 10;  // 直线状态
     }
     return 0;
 }
 void Start_Turn_Keep(uint8_t direction)
 {
    turn_keep_flag = 1;
-   turn_keep_time =10;  // 设置保持时间
+   turn_keep_time =12;  // 设置保持时间
   turn_direction = direction;
 }
 
@@ -137,15 +146,15 @@ void Infrared_TrackingControl(void)
     }
     else if(infrared_track_state == 1) {  // 左弯状态
         // 左转弯时，左轮减速，右轮加速
-        targetSpeed1 = base_speed - 25;   // 左轮减速
-        targetSpeed2 = base_speed + 40;
- Start_Turn_Keep(1);		// 右轮加速
+        targetSpeed1 = base_speed - 20;   // 左轮减速
+        targetSpeed2 = base_speed + 30;
+ 		// 右轮加速
     }
     else if(infrared_track_state == 2) {  // 右弯状态
       //   右转弯时，右轮减速，左轮加速
-        targetSpeed1= base_speed + 40;   // 左轮加速
-        targetSpeed2 = base_speed - 25; 
-	 Start_Turn_Keep(2); // 右轮减速
+        targetSpeed1= base_speed + 30;   // 左轮加速
+        targetSpeed2 = base_speed - 20; 
+	 // 右轮减速
 	}		
     else if(infrared_track_state == 3) {  
         targetSpeed1= base_speed-10;    // 左轮基准速度
@@ -153,27 +162,56 @@ void Infrared_TrackingControl(void)
     }
 	    else if(infrared_track_state == 5) {  // 左弯状态
         // 左转弯时，左轮减速，右轮加速
+			
+        targetSpeed1 = base_speed - 20;   // 左轮减速
+        targetSpeed2 = base_speed + 30;
 			Start_Turn_Keep(1);
-        targetSpeed1 = base_speed - 25;   // 左轮减速
-        targetSpeed2 = base_speed + 40;  // 右轮加速
+			// 右轮加速
     }
     else if(infrared_track_state == 6) {  // 右弯状态
-   Start_Turn_Keep(2);
-        targetSpeed1= base_speed + 40;   // 左轮加速
-        targetSpeed2 = base_speed - 25;
+   
+        targetSpeed1= base_speed +30;   // 左轮加速
+        targetSpeed2 = base_speed - 20;
+		Start_Turn_Keep(2);
+		
+	}
+		    else if(infrared_track_state == 8) {  // 左弯状态
+        // 左转弯时，左轮减速，右轮加速
+			
+        targetSpeed1 = base_speed - 10;   // 左轮减速
+        targetSpeed2 = base_speed + 15;  // 右轮加速
+    }
+    else if(infrared_track_state == 9) {  // 右弯状态
+   
+        targetSpeed1= base_speed + 15;   // 左轮加速
+        targetSpeed2 = base_speed - 10;
 		
 	}
 
     else if(infrared_track_state == 4) {  // 丢失路线状态
 
+       if(last_track_state == 1||last_track_state==5) {  // 上一次是左弯
+
+            targetSpeed1 = base_speed - 15;   // 左轮减速
+            targetSpeed2 = base_speed + 15;  // 右轮加速
+       }
+       else if(last_track_state == 2||last_track_state==6) {  // 上一次是右弯
+
+            targetSpeed1 = base_speed +15;   // 左轮加速
+            targetSpeed2 = base_speed - 15;  // 右轮减速
+        }
+        else 
+		{
+           targetSpeed1 = base_speed -5;   // 左轮低速
+            targetSpeed2 = base_speed -5;  // 右轮低速
+       }}
+    
     
        
-    
-           targetSpeed1 = base_speed-10 ;   // 左轮低速
-            targetSpeed2 = base_speed-10; // 右轮低速
+     
         
-    }
-	   else if(infrared_track_state == 8) {  // 丢失路线状态
+    
+	   else if(infrared_track_state == 10) {  // 丢失路线状态
 
     
        
@@ -189,14 +227,17 @@ void Infrared_TrackingControl(void)
 	}
 	else 
 	{
-	  targetSpeed1 = base_speed-10 ;   // 左轮低速
-            targetSpeed2 = base_speed-10;
+	  targetSpeed1 = base_speed-5 ;   // 左轮低速
+            targetSpeed2 = base_speed-5;
 	}
 
     if(targetSpeed1 > 90) targetSpeed1 =90;
     if(targetSpeed1 < -90) targetSpeed1 = -90;
     if(targetSpeed2 > 90) targetSpeed2 = 90;
     if(targetSpeed2 < -90) targetSpeed2 = -90;
-
+ if (infrared_track_state != 4 && infrared_track_state != 7) {
+        last_track_state = infrared_track_state;
+    }
+           
 }
 
